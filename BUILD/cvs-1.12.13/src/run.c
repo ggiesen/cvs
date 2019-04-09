@@ -150,6 +150,8 @@ run_exec (const char *stin, const char *stout, const char *sterr, int flags)
     int rc = -1;
     int rerrno = 0;
     int pid, w;
+    int pipefd[2];
+    char *run_argv2[3] = { NULL, "-", NULL };
 
 #ifdef POSIX_SIGNALS
     sigset_t sigset_mask, sigset_omask;
@@ -192,7 +194,26 @@ run_exec (const char *stin, const char *stout, const char *sterr, int flags)
     mode_out |= ((flags & RUN_STDOUT_APPEND) ? O_APPEND : O_TRUNC);
     mode_err |= ((flags & RUN_STDERR_APPEND) ? O_APPEND : O_TRUNC);
 
-    if (stin && (shin = open (stin, O_RDONLY)) == -1)
+    if (*(run_argv[0]) == '|')
+    {
+        char *buf;
+
+        if (pipe(pipefd) == -1) {
+           rerrno = errno;
+           error (0, errno, "unable to open pipe");
+           goto out0;
+        }
+        flags |= RUN_PIPE;
+        shin = pipefd[0];
+        buf = strdup(run_argv[0] + 1); /* skip '|' */
+        if (buf == NULL) {
+            rc = ENOMEM;
+            error (0, errno, "unable to allocate memory");
+            goto out1;
+        }
+        run_argv2[0] = buf;
+    }
+    else if (stin && (shin = open (stin, O_RDONLY)) == -1)
     {
 	rerrno = errno;
 	error (0, errno, "cannot open %s for reading (prog %s)",
@@ -268,8 +289,14 @@ run_exec (const char *stin, const char *stout, const char *sterr, int flags)
 #endif
 
 	/* dup'ing is done.  try to run it now */
-	(void) execvp (run_argv[0], run_argv);
-	error (0, errno, "cannot exec %s", run_argv[0]);
+        if (flags & RUN_PIPE) {
+            close(pipefd[1]);
+            (void) execvp (run_argv2[0], run_argv2);
+	    error (0, errno, "cannot exec %s", run_argv2[0]);
+        } else {
+	    (void) execvp (run_argv[0], run_argv);
+	    error (0, errno, "cannot exec %s", run_argv[0]);
+        }
 	_exit (127);
     }
     else if (pid == -1)
@@ -312,6 +339,39 @@ run_exec (const char *stin, const char *stout, const char *sterr, int flags)
 #endif
 #endif
 
+    /* write all the arguments in the stdout if requested */
+    if (flags & RUN_PIPE) {
+        int size, s;
+
+	close(pipefd[0]);
+        for (w = 0; run_argv[w] != NULL; w++) {
+             size = strlen(run_argv[w]);
+             s = 0;
+             while (s < size) {
+                 rc = write(pipefd[1], run_argv[w] + s, size - s);
+                 if (rc < 0 && errno != EINTR) {
+                     /* all other cases we'll just fail */
+                     rerrno = errno;
+                     error (0, errno, "unable to write to the application's stdin %s",
+                            run_argv2[0]);
+                     goto wait_for_process;
+                 } else if (rc > 0)
+                     s += rc;
+             }
+             do {
+                 rc = write(pipefd[1], "\n", 1);
+                 if (rc < 0 && errno != EINTR) {
+                     rerrno = errno;
+                     error (0, errno, "unable to write to the application's stdin %s",
+                            run_argv2[0]);
+                     goto wait_for_process;
+                 }
+             } while (rc != 1);
+        }
+wait_for_process:
+        close(pipefd[1]);
+        pipefd[1] = -1;
+    }
     /* wait for our process to die and munge return status */
 #ifdef POSIX_SIGNALS
     while ((w = waitpid (pid, &status, 0)) == -1 && errno == EINTR)
@@ -385,7 +445,14 @@ run_exec (const char *stin, const char *stout, const char *sterr, int flags)
 	 * relative to the protocol pipe
 	 */
 	cvs_flushout();
+    if (flags & RUN_PIPE)
+        free(run_argv2[0]);
   out1:
+    if (flags & RUN_PIPE) {
+        shin = -1;
+        if (pipefd[1] != -1)
+            close(pipefd[1]);
+    }
     if (stin)
 	(void) close (shin);
 

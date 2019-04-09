@@ -675,6 +675,8 @@ void read_cvsrc (int *argc, char ***argv, const char *cmdname);
 #define	RUN_STDOUT_APPEND     0x0004    /* append to stdout, don't truncate */
 #define	RUN_STDERR_APPEND     0x0008    /* append to stderr, don't truncate */
 #define	RUN_SIGIGNORE         0x0010    /* ignore interrupts for command */
+#define	RUN_PIPE              0x0020	/* pass the arguments by stdin instead
+                                         * as arguments */
 #define	RUN_TTY               (char *)0 /* for the benefit of lint */
 
 void run_add_arg_p (int *, size_t *, char ***, const char *s);
