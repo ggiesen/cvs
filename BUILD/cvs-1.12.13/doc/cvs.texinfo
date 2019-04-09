@@ -2977,10 +2977,10 @@ an empty @file{CVSROOT/passwd} password file, and set
 @code{SystemAuth=no} in the config file
 (@pxref{config}).
 
-The GSSAPI server uses a principal name of
-cvs/@var{hostname}, where @var{hostname} is the
-canonical name of the server host.  You will have to
-set this up as required by your GSSAPI mechanism.
+The GSSAPI server uses a principal name of cvs/@var{hostname}, where
+@var{hostname} can be any name.  There is no restriction to canonical
+hostname to allow DNS load-balanced clusters.  It assumes your GSSAPI
+mechanism can select a key with a host name matching client's request.
 
 To connect using GSSAPI, use the @samp{:gserver:} method.  For
 example,

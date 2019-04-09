@@ -7380,7 +7380,6 @@ error 0 kerberos: %s\n", krb_get_err_text(status));
 static void
 gserver_authenticate_connection (void)
 {
-    struct addrinfo hints, *res0;
     char *hn;
     gss_buffer_desc tok_in, tok_out;
     char buf[1024];
@@ -7392,21 +7391,12 @@ gserver_authenticate_connection (void)
     int nbytes;
     gss_OID mechid;
 
-    memset (&hints, 0, sizeof(hints));
-    hints.ai_family = af;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_CANONNAME;
-    if (getaddrinfo (server_hostname, NULL, &hints, &res0))
- 	error (1, 0, "can't get canonical hostname");
-
-    sprintf (buf, "cvs@%s", res0->ai_canonname);
-    freeaddrinfo (res0);
-    tok_in.value = buf;
-    tok_in.length = strlen (buf);
+    tok_in.value = "cvs";
+    tok_in.length = strlen (tok_in.value);
 
     if (gss_import_name (&stat_min, &tok_in, GSS_C_NT_HOSTBASED_SERVICE,
 			 &server_name) != GSS_S_COMPLETE)
-	error (1, 0, "could not import GSSAPI service name %s", buf);
+	error (1, 0, "could not import GSSAPI service name %s", tok_in.value);
 
     /* Acquire the server credential to verify the client's
        authentication.  */
