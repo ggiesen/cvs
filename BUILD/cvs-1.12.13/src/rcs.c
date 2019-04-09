@@ -3347,7 +3347,7 @@ RCS_check_kflag (const char *arg)
 void
 RCS_check_tag (const char *tag)
 {
-    char *invalid = "$,.:;@";		/* invalid RCS tag characters */
+    char *invalid = "$,.:;@/";		/* invalid RCS tag characters */
     const char *cp;
 
     /*
