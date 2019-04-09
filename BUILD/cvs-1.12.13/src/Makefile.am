@@ -131,15 +131,15 @@ check-local: localcheck remotecheck proxycheck
 
 .PHONY: localcheck
 localcheck: sanity.config.sh
-	$(SHELL) $(srcdir)/sanity.sh `pwd`/cvs$(EXEEXT)
+	$(SHELL) $(srcdir)/sanity.sh -v `pwd`/cvs$(EXEEXT)
 
 .PHONY: remotecheck
 remotecheck: all sanity.config.sh
-	$(SHELL) $(srcdir)/sanity.sh -r `pwd`/cvs$(EXEEXT)
+	$(SHELL) $(srcdir)/sanity.sh -v -r `pwd`/cvs$(EXEEXT)
 
 .PHONY: proxycheck
 proxycheck: all sanity.config.sh
-	$(SHELL) $(srcdir)/sanity.sh -p `pwd`/cvs$(EXEEXT)
+	$(SHELL) $(srcdir)/sanity.sh -v -p `pwd`/cvs$(EXEEXT)
 
 # Our distclean targets
 distclean-local:
