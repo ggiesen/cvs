@@ -6091,6 +6091,15 @@ server_cleanup (void)
 
     assert (server_active);
 
+#ifndef DONT_USE_SIGNALS
+#ifdef SIGABRT
+    /* Need to deregister the SIGABRT handler so that if an assertion
+       fails and calls abort while we're cleaning up, we won't
+       infinitely recurse in the cleanup function. */
+    SIG_deregister(SIGABRT, server_cleanup);
+#endif
+#endif /* !DONT_USE_SIGNALS */
+
     /* FIXME: Do not perform buffered I/O from an interrupt handler like
      * this (via error).  However, I'm leaving the error-calling code there
      * in the hope that on the rare occasion the error call is actually made

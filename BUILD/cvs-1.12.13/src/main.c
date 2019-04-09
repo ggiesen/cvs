@@ -398,6 +398,13 @@ main_cleanup (int sig)
     const char *name;
     char temp[10];
 
+#ifdef SIGABRT
+    /* Need to deregister the SIGABRT handler so that if an assertion
+       fails and calls abort while we're cleaning up, we won't
+       infinitely recurse in the cleanup function. */
+    SIG_deregister(SIGABRT, main_cleanup);
+#endif
+
     switch (sig)
     {
 #ifdef SIGABRT
