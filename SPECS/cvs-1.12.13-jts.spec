@@ -85,7 +85,7 @@ Patch30: cvs-1.12.13-crypt-2.patch
 # autoreconf --install error because AM_GNU_GETTEXT_VERSION has no version info.
 Patch31: cvs-1.12.13-need-gettext-version.patch
 # Fix some basic error
-Patch32: cvs-1.12.13-nocvsroot.patch
+Patch32: cvs-1.12.13-fixjts1.patch
 
 %description
 CVS (Concurrent Versions System) is a version control system that can
