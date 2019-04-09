@@ -86,6 +86,8 @@ Patch30: cvs-1.12.13-crypt-2.patch
 Patch31: cvs-1.12.13-need-gettext-version.patch
 # Fix some basic error
 Patch32: cvs-1.12.13-fixjts1.patch
+# Fix ABOUT-NLS file to work autoreconf
+Patch33: cvs-1.12.13-about-nls.patch
 
 %description
 CVS (Concurrent Versions System) is a version control system that can
@@ -163,6 +165,7 @@ pages in PDF.
 %patch30 -p1 -b .null_crypt
 %patch31 -p1 -b .gettext
 %patch32 -p1 -b .fixjts1
+%patch33 -p1 -b .aboutnls
 
 # Apply a patch to the generated files, OR
 # run autoreconf and require autoconf >= 2.58, automake >= 1.7.9
@@ -174,7 +177,7 @@ done
 
 %build
 %global _hardened_build 1
-#autoreconf --install
+autoreconf --install
 
 %if %{pamified} 
     PAM_CONFIG="--enable-pam"
