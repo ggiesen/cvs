@@ -40,34 +40,74 @@ start_kerberos4_server (cvsroot_t *root, struct buffer **to_server_p,
 {
     int s;
     int port;
-    struct hostent *hp;
-    struct sockaddr_in sin;
+    int gerr;
+    struct addrinfo hints, *res, *res0;
     char *hname;
-
-    s = socket (AF_INET, SOCK_STREAM, 0);
-    if (s < 0)
-	error (1, 0, "cannot create socket: %s", SOCK_STRERROR (SOCK_ERRNO));
+    char pbuf[32], hbuf[1025];
 
     port = get_cvs_port_number (root);
 
-    hp = init_sockaddr (&sin, root->hostname, port);
+    sprintf (pbuf, "%u", port);
+    pbuf[sizeof(pbuf)-1] = '\0';
+    memset (&hints, 0, sizeof(hints));
+    hints.ai_family = af;
+    hints.ai_socktype = SOCK_STREAM;
+    gerr = getaddrinfo (root->hostname, pbuf, &hints, &res0);
+    if (gerr) {
+	fprintf (stderr, "Unknown host %s.\n", root->hostname);
+	exit (EXIT_FAILURE);
+    }
 
-    hname = xstrdup (hp->h_name);
-  
-    TRACE (TRACE_FUNCTION, "Connecting to %s(%s):%d",
-	   root->hostname,
-	   inet_ntoa (sin.sin_addr),
-	   port);
-
-    if (connect (s, (struct sockaddr *) &sin, sizeof sin) < 0)
-	error (1, 0, "connect to %s(%s):%d failed: %s",
-	       root->hostname,
-	       inet_ntoa (sin.sin_addr),
-	       port, SOCK_STRERROR (SOCK_ERRNO));
+    /* Try connect to current_parsed_root->hostname using all available families */
+    gerr = -1;
+    for (res = res0; res != NULL; res = res->ai_next)
+    {
+	s = socket (res->ai_family, res->ai_socktype, 0);
+	if (s < 0)
+	{
+	    if (res->ai_next)
+		continue;
+	    else
+	    {
+		char *sock_error = SOCK_STRERROR (SOCK_ERRNO);
+		freeaddrinfo(res0);
+		error (1, 0, "cannot create socket: %s", sock_error);
+	    }
+	}
+	if (trace)
+	{
+	    char hbuf[1025];
+	    getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf),
+		    NULL, 0, NI_NUMERICHOST);
+	    fprintf (stderr, " -> Connecting to %s(%s):%d\n",
+		    root->hostname, hbuf, port);
+	}
+	
+	if (connect (s, res->ai_addr, res->ai_addrlen) < 0)
+	{
+	    if (res->ai_next)
+	    {
+		close(s);
+		continue;
+	    }
+	    else
+	    {
+		char *sock_error = SOCK_STRERROR (SOCK_ERRNO);
+		freeaddrinfo(res0);
+		error (1, 0, "connect to [%s]:%s failed: %s",
+			root->hostname, pbuf, sock_error);
+	    }
+	}
+	getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf), NULL, 0, 0);
+	hname = xmalloc (strlen (hbuf) + 1);
+	strcpy (hname, hbuf);
+	/* success */
+	break;
+    }
 
     {
 	const char *realm;
-	struct sockaddr_in laddr;
+	struct sockaddr_storage laddr;
 	int laddrlen;
 	KTEXT_ST ticket;
 	MSG_DAT msg_data;
@@ -83,12 +123,14 @@ start_kerberos4_server (cvsroot_t *root, struct buffer **to_server_p,
 	/* We don't care about the checksum, and pass it as zero.  */
 	status = krb_sendauth (KOPT_DO_MUTUAL, s, &ticket, "rcmd",
 			       hname, realm, (unsigned long) 0, &msg_data,
-			       &cred, sched, &laddr, &sin, "KCVSV1.0");
+			       &cred, sched, &laddr, res->ai_addr, "KCVSV1.0");
 	if (status != KSUCCESS)
 	    error (1, 0, "kerberos authentication failed: %s",
 		   krb_get_err_text (status));
 	memcpy (kblock, cred.session, sizeof (C_Block));
     }
+
+    freeaddrinfo(res0);
 
     close_on_exec (s);
 

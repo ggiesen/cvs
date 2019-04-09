@@ -370,6 +370,7 @@ extern char *CurDir;
 extern int really_quiet, quiet;
 extern int use_editor;
 extern int cvswrite;
+extern int af;
 extern mode_t cvsumask;
 
 /* Temp dir abstraction.  */

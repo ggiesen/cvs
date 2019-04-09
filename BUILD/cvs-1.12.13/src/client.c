@@ -71,7 +71,7 @@ int update (int argc, char **argv);
 static size_t try_read_from_server (char *, size_t);
 
 static void auth_server (cvsroot_t *, struct buffer *, struct buffer *,
-			 int, int, struct hostent *);
+			 int, int, char *);
 
 
 
@@ -3500,44 +3500,62 @@ connect_to_pserver (cvsroot_t *root, struct buffer **to_server_p,
     int sock;
     int port_number,
 	proxy_port_number = 0; /* Initialize to silence -Wall.  Dumb.  */
-    union sai {
-	struct sockaddr_in addr_in;
-	struct sockaddr addr;
-    } client_sai;
-    struct hostent *hostinfo;
+    int gerr;
+    struct addrinfo hints, *res, *res0;
+    char pbuf[32];
     struct buffer *to_server, *from_server;
+    char *p_hostname;
 
-    sock = socket (AF_INET, SOCK_STREAM, 0);
-    if (sock == -1)
-	error (1, 0, "cannot create socket: %s", SOCK_STRERROR (SOCK_ERRNO));
     port_number = get_cvs_port_number (root);
 
-    /* if we have a proxy connect to that instead */
-    if (root->proxy_hostname)
+    sprintf (pbuf, "%u", (root->proxy_hostname) ? get_proxy_port_number (root) : port_number);
+    pbuf[sizeof(pbuf)-1] = '\0';
+    memset (&hints, 0, sizeof (hints));
+    hints.ai_family = af;
+    hints.ai_socktype = SOCK_STREAM;
+
+    /* do we have a proxy? */
+    p_hostname = (root->proxy_hostname) ? root->proxy_hostname : root->hostname;
+
+    gerr = getaddrinfo (p_hostname, pbuf, &hints, &res0);
+    if (gerr)
     {
-        proxy_port_number = get_proxy_port_number (root);
-	hostinfo = init_sockaddr (&client_sai.addr_in, root->proxy_hostname,
-                                  proxy_port_number);
-        TRACE (TRACE_FUNCTION, "Connecting to %s:%d via proxy %s(%s):%d.",
-               root->hostname, port_number, root->proxy_hostname,
-               inet_ntoa (client_sai.addr_in.sin_addr), proxy_port_number);
-    }
-    else
-    {
-	hostinfo = init_sockaddr (&client_sai.addr_in, root->hostname,
-				  port_number);
-        TRACE (TRACE_FUNCTION, "Connecting to %s(%s):%d.",
-               root->hostname,
-               inet_ntoa (client_sai.addr_in.sin_addr), port_number);
+       fprintf (stderr, "Unknown host %s.\n", p_hostname);
+       exit (EXIT_FAILURE);
     }
 
-    if (connect (sock, &client_sai.addr, sizeof (client_sai))
-	< 0)
-	error (1, 0, "connect to %s(%s):%d failed: %s",
-	       root->proxy_hostname ? root->proxy_hostname : root->hostname,
-	       inet_ntoa (client_sai.addr_in.sin_addr),
-	       root->proxy_hostname ? proxy_port_number : port_number,
-               SOCK_STRERROR (SOCK_ERRNO));
+    /* Try connect to p_hostname using all available families */
+    for (res = res0; res != NULL; res = res->ai_next)
+    {
+        sock = socket (res->ai_family, res->ai_socktype, 0);
+        if (sock == -1) {
+            if (res->ai_next)
+                continue;
+            else {
+                char *sock_error = SOCK_STRERROR (SOCK_ERRNO);
+                freeaddrinfo(res0);
+                error (1, 0, "cannot create socket: %s", sock_error);
+            }
+        }
+
+        if (connect (sock, res->ai_addr, res->ai_addrlen) < 0)
+        {
+            if (res->ai_next)
+            {
+                close(sock);
+                continue;
+            }
+            else
+            {
+                char *sock_error = SOCK_STRERROR (SOCK_ERRNO);
+                freeaddrinfo(res0);
+                error (1, 0, "connect to [%s]:%s failed: %s", p_hostname,
+                        pbuf, sock_error);
+            }
+        }
+        /* success */
+        break;
+    }
 
     make_bufs_from_fds (sock, sock, 0, root, &to_server, &from_server, 1);
 
@@ -3580,7 +3598,7 @@ connect_to_pserver (cvsroot_t *root, struct buffer **to_server_p,
     }
 
     auth_server (root, to_server, from_server, verify_only, do_gssapi,
-                 hostinfo);
+                 p_hostname);
 
     if (verify_only)
     {
@@ -3616,7 +3634,7 @@ connect_to_pserver (cvsroot_t *root, struct buffer **to_server_p,
 static void
 auth_server (cvsroot_t *root, struct buffer *to_server,
              struct buffer *from_server, int verify_only, int do_gssapi,
-             struct hostent *hostinfo)
+             char *hostname)
 {
     char *username = NULL;		/* the username we use to connect */
     char no_passwd = 0;			/* gets set if no password found */
@@ -3634,7 +3652,7 @@ auth_server (cvsroot_t *root, struct buffer *to_server,
                    "gserver currently only enabled for socket connections");
 	}
 
-	if (! connect_to_gserver (root, fd, hostinfo))
+	if (! connect_to_gserver (root, fd, hostname))
 	{
 	    error (1, 0,
 		    "authorization failed: server %s rejected access to %s",
@@ -5154,24 +5172,6 @@ send_init_command (void)
 
 #if defined AUTH_CLIENT_SUPPORT || defined HAVE_KERBEROS || defined HAVE_GSSAPI
 
-struct hostent *
-init_sockaddr (struct sockaddr_in *name, char *hostname, unsigned int port)
-{
-    struct hostent *hostinfo;
-    unsigned short shortport = port;
-
-    memset (name, 0, sizeof (*name));
-    name->sin_family = AF_INET;
-    name->sin_port = htons (shortport);
-    hostinfo = gethostbyname (hostname);
-    if (!hostinfo)
-    {
-	fprintf (stderr, "Unknown host %s.\n", hostname);
-	exit (EXIT_FAILURE);
-    }
-    name->sin_addr = *(struct in_addr *) hostinfo->h_addr;
-    return hostinfo;
-}
 
 #endif /* defined AUTH_CLIENT_SUPPORT || defined HAVE_KERBEROS
 	* || defined HAVE_GSSAPI

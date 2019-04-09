@@ -17,6 +17,7 @@
  *
  */
 
+#include <sys/socket.h>
 #include "cvs.h"
 
 #include "closeout.h"
@@ -43,6 +44,7 @@ int trace = 0;
 int noexec = 0;
 int readonlyfs = 0;
 int logoff = 0;
+int af = AF_UNSPEC;
 
 
 
@@ -196,7 +198,7 @@ static const char *const usg[] =
        in --help as it is a rather different format from the rest.  */
 
     "Usage: %s [cvs-options] command [command-options-and-arguments]\n",
-    "  where cvs-options are -q, -n, etc.\n",
+    "  where cvs-options are -4, -6, -q, -n, etc.\n",
     "    (specify --help-options for a list of options)\n",
     "  where command is add, admin, etc.\n",
     "    (specify --help-commands for a list of commands\n",
@@ -299,6 +301,8 @@ static const char *const opt_usage[] =
 #endif
     "    -a           Authenticate all net traffic.\n",
 #endif
+    "    -4           Use IPv4.\n",
+    "    -6           Use IPv6.\n",
     "    -s VAR=VAL   Set CVS user variable.\n",
     "(Specify the --help option for a list of other help options)\n",
     NULL
@@ -518,7 +522,7 @@ main (int argc, char **argv)
     int help = 0;		/* Has the user asked for help?  This
 				   lets us support the `cvs -H cmd'
 				   convention to give help for cmd. */
-    static const char short_options[] = "+QqrwtnRvb:T:e:d:Hfz:s:xa";
+    static const char short_options[] = "+46QqrwtnRvb:T:e:d:Hfz:s:xa";
     static struct option long_options[] =
     {
         {"help", 0, NULL, 'H'},
@@ -653,6 +657,12 @@ main (int argc, char **argv)
 		root_allow_add (optarg, gConfigPath);
 		break;
 #endif /* SERVER_SUPPORT */
+	    case '4':
+		af = AF_INET;
+		break;
+	    case '6':
+		af = AF_INET6;
+		break;
 	    case 'Q':
 		really_quiet = 1;
 		/* FALL THROUGH */

@@ -7301,8 +7301,8 @@ kserver_authenticate_connection( void )
 {
     int status;
     char instance[INST_SZ];
-    struct sockaddr_in peer;
-    struct sockaddr_in laddr;
+    struct sockaddr_storage peer;
+    struct sockaddr_storage laddr;
     int len;
     KTEXT_ST ticket;
     AUTH_DAT auth;
@@ -7380,6 +7380,7 @@ error 0 kerberos: %s\n", krb_get_err_text(status));
 static void
 gserver_authenticate_connection (void)
 {
+    struct addrinfo hints, *res0;
     char *hn;
     gss_buffer_desc tok_in, tok_out;
     char buf[1024];
@@ -7391,13 +7392,15 @@ gserver_authenticate_connection (void)
     int nbytes;
     gss_OID mechid;
 
-    hn = canon_host (server_hostname);
-    if (!hn)
-	error (1, 0, "can't get canonical hostname for `%s': %s",
-	       server_hostname, ch_strerror ());
+    memset (&hints, 0, sizeof(hints));
+    hints.ai_family = af;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_CANONNAME;
+    if (getaddrinfo (server_hostname, NULL, &hints, &res0))
+ 	error (1, 0, "can't get canonical hostname");
 
-    sprintf (buf, "cvs@%s", hn);
-    free (hn);
+    sprintf (buf, "cvs@%s", res0->ai_canonname);
+    freeaddrinfo (res0);
     tok_in.value = buf;
     tok_in.length = strlen (buf);
 
