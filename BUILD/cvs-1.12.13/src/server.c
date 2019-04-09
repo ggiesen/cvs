@@ -6807,9 +6807,11 @@ check_repository_password (char *username, char *password, char *repository, cha
 	    host_user_tmp = username;
 
 	/* Verify blank passwords directly, otherwise use crypt(). */
+	char *crypt_passwd = found_password ? crypt (password, found_password): NULL;
 	if ((found_password == NULL)
-	    || ((strcmp (found_password, crypt (password, found_password))
-		 == 0)))
+	    || (crypt_passwd != NULL
+               && (strcmp (found_password, crypt_passwd)
+		    == 0)))
 	{
 	    /* Give host_user_ptr permanent storage. */
 	    *host_user_ptr = xstrdup (host_user_tmp);
@@ -6820,7 +6822,7 @@ check_repository_password (char *username, char *password, char *repository, cha
 #ifdef LOG_AUTHPRIV
 	syslog (LOG_AUTHPRIV | LOG_NOTICE,
 		"password mismatch for %s in %s: %s vs. %s", username,
-		repository, crypt(password, found_password), found_password);
+		repository, crypt_passwd, found_password);
 #endif
 	    *host_user_ptr = NULL;
 	    retval	 = 2;
@@ -6985,14 +6987,17 @@ error 0 %s: no such user\n", username);
     if (*found_passwd)
     {
 	/* user exists and has a password */
-	if (strcmp (found_passwd, crypt (password, found_passwd)) == 0)
+	char *crypt_passwd = crypt (password, found_passwd);
+	if ((crypt_passwd != NULL) &&
+	    (strcmp (found_passwd, crypt_passwd) == 0))
+
 	    return 1;
 	else
 	{
 #ifdef LOG_AUTHPRIV
 	    syslog (LOG_AUTHPRIV | LOG_NOTICE,
 		    "password mismatch for %s: %s vs. %s", username,
-		    crypt(password, found_passwd), found_passwd);
+		    crypt_passwd, found_passwd);
 #endif
 	    return 0;
 	}
