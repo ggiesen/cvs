@@ -68,6 +68,9 @@ under the terms of the GNU General Public License.
 For more information about these matters, see the files named COPYING.
 Author: Paul Eggert <eggert@twinsun.com>'
 
+# set old environment for sort (bug #190009)
+export _POSIX2_VERSION=199209
+
 # functions
 @MKTEMP_SH_FUNCTION@
 
