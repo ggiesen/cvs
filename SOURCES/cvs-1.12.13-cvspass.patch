@@ -1,0 +1,77 @@
+diff -u -r orig/src/login.c new/src/login.c
+--- orig/src/login.c	2005-05-14 06:47:28.000000000 +0900
++++ new/src/login.c	2019-04-06 18:00:05.938811171 +0900
+@@ -309,6 +309,15 @@
+     fp = CVS_FOPEN (passfile, "r");
+     if (fp == NULL)
+     {
++       fp = CVS_FOPEN (passfile, "w");
++       if (fp != NULL)
++       {
++           fclose (fp);
++           fp = CVS_FOPEN (passfile, "r");
++       }
++    }
++    if (fp == NULL)
++    {
+ 	error (0, errno, "warning: failed to open %s for reading", passfile);
+ 	goto process;
+     }
+new/src のみに存在: login.c.cvspass
+diff -u -r orig/src/logmsg.c new/src/logmsg.c
+--- orig/src/logmsg.c	2005-09-04 09:27:44.000000000 +0900
++++ new/src/logmsg.c	2019-04-06 18:00:05.938811171 +0900
+@@ -265,7 +265,7 @@
+     }
+ 
+     (void) fprintf (fp,
+-  "%s----------------------------------------------------------------------\n",
++  "\n%s----------------------------------------------------------------------\n",
+ 		    CVSEDITPREFIX);
+     (void) fprintf (fp,
+   "%sEnter Log.  Lines beginning with `%.*s' are removed automatically\n%s\n",
+diff -u -r orig/src/sanity.sh new/src/sanity.sh
+--- orig/src/sanity.sh	2005-09-23 05:34:06.000000000 +0900
++++ new/src/sanity.sh	2019-04-06 23:11:36.658574338 +0900
+@@ -15741,6 +15741,7 @@
+ revision 1\.1
+ date: ${ISO8601DATE};  author: ${username};  state: Exp;  commitid: ${commitid};
+ branches:  1\.1\.2;
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15752,6 +15753,7 @@
+ ----------------------------
+ revision 1\.1\.2\.1
+ date: ${ISO8601DATE};  author: ${username};  state: Exp;  lines: ${PLUS}1 -0;  commitid: ${commitid};
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15779,6 +15781,7 @@
+ revision 1\.1
+ date: ${ISO8601DATE};  author: ${username};  state: Exp;  commitid: ${commitid};
+ branches:  1\.1\.2;
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15790,6 +15793,7 @@
+ ----------------------------
+ revision 1\.1\.2\.1
+ date: ${ISO8601DATE};  author: ${username};  state: Exp;  lines: ${PLUS}1 -0;  commitid: ${commitid};
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+@@ -15811,6 +15815,7 @@
+ revision 1\.1
+ date: ${ISO8601DATE};  author: ${username};  state: Exp;  commitid: ${commitid};
+ branches:  1\.1\.2;
++x
+ xCVS: ----------------------------------------------------------------------
+ xCVS: Enter Log.  Lines beginning with .CVS:. are removed automatically
+ xCVS:
+new/src のみに存在: sanity.sh.cvspass
+new/src のみに存在: sanity.sh.rej

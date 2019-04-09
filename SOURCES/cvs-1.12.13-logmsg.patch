@@ -1,0 +1,21 @@
+diff -u -r orig/src/logmsg.c new/src/logmsg.c
+--- orig/src/logmsg.c	2019-04-07 00:38:51.621871167 +0900
++++ new/src/logmsg.c	2019-04-07 00:48:11.641868361 +0900
+@@ -223,6 +223,8 @@
+ 	if ((*messagep)[0] == '\0' ||
+ 	    (*messagep)[strlen (*messagep) - 1] != '\n')
+ 	    (void) fprintf (fp, "\n");
++    } else {
++	(void) fprintf (fp, "\n");
+     }
+ 
+     if (repository != NULL)
+@@ -265,7 +267,7 @@
+     }
+ 
+     (void) fprintf (fp,
+-  "\n%s----------------------------------------------------------------------\n",
++  "%s----------------------------------------------------------------------\n",
+ 		    CVSEDITPREFIX);
+     (void) fprintf (fp,
+   "%sEnter Log.  Lines beginning with `%.*s' are removed automatically\n%s\n",

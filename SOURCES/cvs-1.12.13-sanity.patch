@@ -1,0 +1,39 @@
+diff -u -r orig/src/sanity.sh new/src/sanity.sh
+--- orig/src/sanity.sh	2019-04-06 23:11:36.658574338 +0900
++++ new/src/sanity.sh	2019-04-07 04:01:31.157031988 +0900
+@@ -3330,7 +3330,7 @@
+ 	  dotest_fail basicb-21 "${testcvs} -q admin -H" \
+ "admin: invalid option -- H
+ ${CPROG} \[admin aborted\]: specify ${CPROG} -H admin for usage information" \
+-"admin: illegal option -- H
++"admin: invalid option -- 'H'
+ ${CPROG} \[admin aborted\]: specify ${CPROG} -H admin for usage information"
+ 	  cd ..
+ 	  rmdir 1
+@@ -23711,7 +23711,7 @@
+ "-r--r--r-- .*"
+ 	  else
+ 	    dotest modes-5 "ls -l ${CVSROOT_DIRNAME}/first-dir/aa,v" \
+-"-r--r--r-- .*"
++"-r--r--r--.*"
+ 	  fi
+ 
+ 	  # Test for whether we can set the execute bit.
+@@ -23730,7 +23730,7 @@
+ "-r--r--r-- .*"
+ 	  else
+ 	    dotest modes-7 "ls -l ${CVSROOT_DIRNAME}/first-dir/aa,v" \
+-"-r--r--r-- .*"
++"-r--r--r--.*"
+ 	  fi
+ 
+ 	  # OK, now manually change the modes and see what happens.
+@@ -23751,7 +23751,7 @@
+ "-r--r----- .*"
+ 	  else
+ 	    dotest modes-7b "ls -l ${CVSROOT_DIRNAME}/first-dir/aa,v" \
+-"-r--r----- .*"
++"-r--r-----.*"
+ 	  fi
+ 
+ 	  CVSUMASK=007

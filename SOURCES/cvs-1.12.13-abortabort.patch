@@ -1,0 +1,74 @@
+diff -u -r orig/src/main.c new/src/main.c
+--- orig/src/main.c	2005-10-03 00:17:21.000000000 +0900
++++ new/src/main.c	2019-04-07 00:21:22.033876443 +0900
+@@ -398,6 +398,13 @@
+     const char *name;
+     char temp[10];
+ 
++#ifdef SIGABRT
++    /* Need to deregister the SIGABRT handler so that if an assertion
++       fails and calls abort while we're cleaning up, we won't
++       infinitely recurse in the cleanup function. */
++    SIG_deregister(SIGABRT, main_cleanup);
++#endif
++
+     switch (sig)
+     {
+ #ifdef SIGABRT
+diff -u -r orig/src/patch.c new/src/patch.c
+--- orig/src/patch.c	2005-09-23 11:03:04.000000000 +0900
++++ new/src/patch.c	2019-04-07 00:25:49.804875100 +0900
+@@ -773,6 +773,15 @@
+        called from a signal handler, without SIG_begincrsect, so
+        we don't know whether the files got created.  */
+ 
++#ifndef DONT_USE_SIGNALS
++#ifdef SIGABRT
++    /* Need to deregister the SIGABRT handler so that if an assertion
++       fails and calls abort while we're cleaning up, we won't
++       infinitely recurse in the cleanup function. */
++    SIG_deregister(SIGABRT, patch_cleanup);
++#endif
++#endif /* !DONT_USE_SIGNALS */
++
+     if (tmpfile1 != NULL)
+     {
+ 	if (unlink_file (tmpfile1) < 0
+diff -u -r orig/src/rcs.c new/src/rcs.c
+--- orig/src/rcs.c	2005-09-29 00:25:59.000000000 +0900
++++ new/src/rcs.c	2019-04-07 00:23:42.409875739 +0900
+@@ -8377,6 +8377,15 @@
+ {
+     TRACE (TRACE_FUNCTION, "rcs_cleanup()");
+ 
++#ifndef DONT_USE_SIGNALS
++#ifdef SIGABRT
++    /* Need to deregister the SIGABRT handler so that if an assertion
++       fails and calls abort while we're cleaning up, we won't
++       infinitely recurse in the cleanup function. */
++    SIG_deregister(SIGABRT, rcs_cleanup);
++#endif
++#endif /* !DONT_USE_SIGNALS */
++
+     /* FIXME: Do not perform buffered I/O from an interrupt handler like
+      * this (via error).  However, I'm leaving the error-calling code there
+      * in the hope that on the rare occasion the error call is actually made
+diff -u -r orig/src/server.c new/src/server.c
+--- orig/src/server.c	2019-04-07 00:18:22.453877341 +0900
++++ new/src/server.c	2019-04-07 00:18:49.363877204 +0900
+@@ -6091,6 +6091,15 @@
+ 
+     assert (server_active);
+ 
++#ifndef DONT_USE_SIGNALS
++#ifdef SIGABRT
++    /* Need to deregister the SIGABRT handler so that if an assertion
++       fails and calls abort while we're cleaning up, we won't
++       infinitely recurse in the cleanup function. */
++    SIG_deregister(SIGABRT, server_cleanup);
++#endif
++#endif /* !DONT_USE_SIGNALS */
++
+     /* FIXME: Do not perform buffered I/O from an interrupt handler like
+      * this (via error).  However, I'm leaving the error-calling code there
+      * in the hope that on the rare occasion the error call is actually made

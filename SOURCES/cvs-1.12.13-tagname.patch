@@ -1,0 +1,12 @@
+diff -u -r orig/src/rcs.c new/src/rcs.c
+--- orig/src/rcs.c	2019-04-07 00:23:42.409875739 +0900
++++ new/src/rcs.c	2019-04-07 00:51:26.766870234 +0900
+@@ -3347,7 +3347,7 @@
+ void
+ RCS_check_tag (const char *tag)
+ {
+-    char *invalid = "$,.:;@";		/* invalid RCS tag characters */
++    char *invalid = "$,.:;@/";		/* invalid RCS tag characters */
+     const char *cp;
+ 
+     /*

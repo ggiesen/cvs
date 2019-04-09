@@ -1,0 +1,54 @@
+diff -u -r orig/doc/cvs.texinfo new/doc/cvs.texinfo
+--- orig/doc/cvs.texinfo	2005-09-23 11:02:53.000000000 +0900
++++ new/doc/cvs.texinfo	2019-04-07 04:29:57.620896906 +0900
+@@ -2977,10 +2977,10 @@
+ @code{SystemAuth=no} in the config file
+ (@pxref{config}).
+ 
+-The GSSAPI server uses a principal name of
+-cvs/@var{hostname}, where @var{hostname} is the
+-canonical name of the server host.  You will have to
+-set this up as required by your GSSAPI mechanism.
++The GSSAPI server uses a principal name of cvs/@var{hostname}, where
++@var{hostname} can be any name.  There is no restriction to canonical
++hostname to allow DNS load-balanced clusters.  It assumes your GSSAPI
++mechanism can select a key with a host name matching client's request.
+ 
+ To connect using GSSAPI, use the @samp{:gserver:} method.  For
+ example,
+diff -u -r orig/src/server.c new/src/server.c
+--- orig/src/server.c	2019-04-07 03:24:56.186027331 +0900
++++ new/src/server.c	2019-04-07 04:33:40.753863866 +0900
+@@ -7380,7 +7380,6 @@
+ static void
+ gserver_authenticate_connection (void)
+ {
+-    struct addrinfo hints, *res0;
+     char *hn;
+     gss_buffer_desc tok_in, tok_out;
+     char buf[1024];
+@@ -7392,21 +7391,12 @@
+     int nbytes;
+     gss_OID mechid;
+ 
+-    memset (&hints, 0, sizeof(hints));
+-    hints.ai_family = af;
+-    hints.ai_socktype = SOCK_STREAM;
+-    hints.ai_flags = AI_CANONNAME;
+-    if (getaddrinfo (server_hostname, NULL, &hints, &res0))
+- 	error (1, 0, "can't get canonical hostname");
+-
+-    sprintf (buf, "cvs@%s", res0->ai_canonname);
+-    freeaddrinfo (res0);
+-    tok_in.value = buf;
+-    tok_in.length = strlen (buf);
++    tok_in.value = "cvs";
++    tok_in.length = strlen (tok_in.value);
+ 
+     if (gss_import_name (&stat_min, &tok_in, GSS_C_NT_HOSTBASED_SERVICE,
+ 			 &server_name) != GSS_S_COMPLETE)
+-	error (1, 0, "could not import GSSAPI service name %s", buf);
++	error (1, 0, "could not import GSSAPI service name %s", tok_in.value);
+ 
+     /* Acquire the server credential to verify the client's
+        authentication.  */

@@ -1,0 +1,33 @@
+diff -u -r orig/src/mkmodules.c new/src/mkmodules.c
+--- orig/src/mkmodules.c	2005-05-25 05:59:01.000000000 +0900
++++ new/src/mkmodules.c	2019-04-07 00:04:40.207465119 +0900
+@@ -73,12 +73,13 @@
+ #endif
+     "#    %p = path relative to repository\n",
+     "#    %r = repository (path portion of $CVSROOT)\n",
+-    "#    %{sVv} = attribute list = file name, old version number (pre-checkin),\n",
+-    "#           new version number (post-checkin).  When either old or new revision\n",
+-    "#           is unknown, doesn't exist, or isn't applicable, the string \"NONE\"\n",
+-    "#           will be placed on the command line instead.\n",
++    "#    %{sVvT} = attribute list = file name, old version number (pre-checkin),\n",
++    "#           new version number (post-checkin), tag or branch name.\n",
++    "#           When either old or new revision is unknown, doesn't exist,\n",
++    "#           or isn't applicable, the string \"NONE\" will be placed\n",
++    "#           on the command line instead.\n",
+     "#\n",
+-    "# Note that %{sVv} is a list operator and not all elements are necessary.\n",
++    "# Note that %{sVvT} is a list operator and not all elements are necessary.\n",
+     "# Thus %{sv} is a legal format string, but will only be replaced with\n",
+     "# file name and new revision.\n",
+     "# It also generates multiple arguments for each file being operated upon.\n",
+diff -u -r orig/src/logmsg.c new/src/logmsg.c
+--- orig/src/logmsg.c	2019-04-06 18:00:05.938811171 +0900
++++ new/src/logmsg.c	2019-04-07 00:38:51.621871167 +0900
+@@ -632,6 +632,7 @@
+ 		arg = p->key;
+ 		break;
+ 	    case 'T':
++	    case 't':
+ 		li = p->data;
+ 		arg = li->tag ? li->tag : "";
+ 		break;

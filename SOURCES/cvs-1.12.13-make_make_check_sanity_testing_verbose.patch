@@ -1,0 +1,22 @@
+diff -u -r orig/src/Makefile.am new/src/Makefile.am
+--- orig/src/Makefile.am	2005-09-25 09:36:26.000000000 +0900
++++ new/src/Makefile.am	2019-04-07 04:06:18.488025080 +0900
+@@ -131,15 +131,15 @@
+ 
+ .PHONY: localcheck
+ localcheck: sanity.config.sh
+-	$(SHELL) $(srcdir)/sanity.sh `pwd`/cvs$(EXEEXT)
++	$(SHELL) $(srcdir)/sanity.sh -v `pwd`/cvs$(EXEEXT)
+ 
+ .PHONY: remotecheck
+ remotecheck: all sanity.config.sh
+-	$(SHELL) $(srcdir)/sanity.sh -r `pwd`/cvs$(EXEEXT)
++	$(SHELL) $(srcdir)/sanity.sh -v -r `pwd`/cvs$(EXEEXT)
+ 
+ .PHONY: proxycheck
+ proxycheck: all sanity.config.sh
+-	$(SHELL) $(srcdir)/sanity.sh -p `pwd`/cvs$(EXEEXT)
++	$(SHELL) $(srcdir)/sanity.sh -v -p `pwd`/cvs$(EXEEXT)
+ 
+ # Our distclean targets
+ distclean-local:
