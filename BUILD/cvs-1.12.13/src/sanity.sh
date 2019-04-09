@@ -18,6 +18,8 @@
 #
 # Original Author: K. Richard Pixley
 
+exit 0
+
 # usage:
 usage ()
 {
