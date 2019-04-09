@@ -5,7 +5,7 @@
 
 Name: cvs
 Version: 1.12.13
-Release: 2jts%{?dist}
+Release: 3jts%{?dist}
 Summary: Concurrent Versions System
 Group: Development/Tools
 URL: http://cvs.nongnu.org/
@@ -84,6 +84,8 @@ Patch29: cvs-1.11.23-doc-Add-mandatory-argument-to-sp.patch
 Patch30: cvs-1.12.13-crypt-2.patch
 # autoreconf --install error because AM_GNU_GETTEXT_VERSION has no version info.
 Patch31: cvs-1.12.13-need-gettext-version.patch
+# Fix some basic error
+Patch32: cvs-1.12.13-nocvsroot.patch
 
 %description
 CVS (Concurrent Versions System) is a version control system that can
@@ -159,7 +161,8 @@ pages in PDF.
 %patch28 -p1 -b .proxy_response_parser
 %patch29 -p1 -b .texinfo_sp
 %patch30 -p1 -b .null_crypt
-#%patch31 -p1 -b .gettext
+%patch31 -p1 -b .gettext
+%patch32 -p1 -b .fixjts1
 
 # Apply a patch to the generated files, OR
 # run autoreconf and require autoconf >= 2.58, automake >= 1.7.9

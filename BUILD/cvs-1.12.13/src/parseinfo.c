@@ -250,7 +250,7 @@ readSizeT (const char *infopath, const char *option, const char *p,
 		       infopath, option, p[strlen(p)]);
 		return false;
 	}
-	TRACE (TRACE_DATA, "readSizeT(): Found factor %u for %s",
+	TRACE (TRACE_DATA, "readSizeT(): Found factor %zu for %s",
 	       factor, option);
     }
 
@@ -274,9 +274,9 @@ readSizeT (const char *infopath, const char *option, const char *p,
 	/* Don't return an error, just max out.  */
 	num = SIZE_MAX;
 
-    TRACE (TRACE_DATA, "readSizeT(): read number %u for %s", num, option);
+    TRACE (TRACE_DATA, "readSizeT(): read number %zu for %s", num, option);
     *val = xtimes (strtoul (p, NULL, 10), factor);
-    TRACE (TRACE_DATA, "readSizeT(): returnning %u for %s", *val, option);
+    TRACE (TRACE_DATA, "readSizeT(): returnning %zu for %s", *val, option);
     return true;
 }
 

@@ -1,0 +1,91 @@
+diff --git a/BUILD/cvs-1.12.13/src/parseinfo.c b/BUILD/cvs-1.12.13/src/parseinfo.c
+index 51e6873..d8d22ef 100644
+--- a/BUILD/cvs-1.12.13/src/parseinfo.c
++++ b/BUILD/cvs-1.12.13/src/parseinfo.c
+@@ -250,7 +250,7 @@ readSizeT (const char *infopath, const char *option, const char *p,
+ 		       infopath, option, p[strlen(p)]);
+ 		return false;
+ 	}
+-	TRACE (TRACE_DATA, "readSizeT(): Found factor %u for %s",
++	TRACE (TRACE_DATA, "readSizeT(): Found factor %zu for %s",
+ 	       factor, option);
+     }
+ 
+@@ -274,9 +274,9 @@ readSizeT (const char *infopath, const char *option, const char *p,
+ 	/* Don't return an error, just max out.  */
+ 	num = SIZE_MAX;
+ 
+-    TRACE (TRACE_DATA, "readSizeT(): read number %u for %s", num, option);
++    TRACE (TRACE_DATA, "readSizeT(): read number %zu for %s", num, option);
+     *val = xtimes (strtoul (p, NULL, 10), factor);
+-    TRACE (TRACE_DATA, "readSizeT(): returnning %u for %s", *val, option);
++    TRACE (TRACE_DATA, "readSizeT(): returnning %zu for %s", *val, option);
+     return true;
+ }
+ 
+diff --git a/BUILD/cvs-1.12.13/src/root.c b/BUILD/cvs-1.12.13/src/root.c
+index 34a957c..5961716 100644
+--- a/BUILD/cvs-1.12.13/src/root.c
++++ b/BUILD/cvs-1.12.13/src/root.c
+@@ -345,7 +345,7 @@ get_root_allow_config (const char *arg, const char *configPath)
+ /* This global variable holds the global -d option.  It is NULL if -d
+    was not used, which means that we must get the CVSroot information
+    from the CVSROOT environment variable or from a CVS/Root file.  */
+-char *CVSroot_cmdline;
++char *CVSroot_cmdline = NULL;
+ 
+ 
+ 
+diff --git a/BUILD/cvs-1.12.13/src/server.c b/BUILD/cvs-1.12.13/src/server.c
+index 6816789..5fb4a9a 100644
+--- a/BUILD/cvs-1.12.13/src/server.c
++++ b/BUILD/cvs-1.12.13/src/server.c
+@@ -977,7 +977,7 @@ error ENOMEM Virtual memory exhausted.\n");
+ 	if (forced && !quiet
+ 	    && alloc_pending_warning (120 + strlen (program_name)))
+ 	    sprintf (pending_warning_text,
+-"E %s server: Forcing compression level %d (allowed: %d <= z <= %d).",
++"E %s server: Forcing compression level %d (allowed: %d <= z <= %zu).",
+ 		     program_name, gzip_level, config->MinCompressionLevel,
+ 		     config->MaxCompressionLevel);
+     }
+@@ -5483,7 +5483,7 @@ serve_gzip_contents (char *arg)
+     if (forced && !quiet
+ 	&& alloc_pending_warning (120 + strlen (program_name)))
+ 	sprintf (pending_warning_text,
+-"E %s server: Forcing compression level %d (allowed: %d <= z <= %d).",
++"E %s server: Forcing compression level %d (allowed: %d <= z <= %zu).",
+ 		 program_name, level, config->MinCompressionLevel,
+ 		 config->MaxCompressionLevel);
+ 
+@@ -5514,7 +5514,7 @@ serve_gzip_stream (char *arg)
+     if (forced && !quiet
+ 	&& alloc_pending_warning (120 + strlen (program_name)))
+ 	sprintf (pending_warning_text,
+-"E %s server: Forcing compression level %d (allowed: %d <= z <= %d).",
++"E %s server: Forcing compression level %d (allowed: %d <= z <= %zu).",
+ 		 program_name, level, config->MinCompressionLevel,
+ 		 config->MaxCompressionLevel);
+ 	
+diff --git a/BUILD/cvs-1.12.13/src/subr.c b/BUILD/cvs-1.12.13/src/subr.c
+index 3c3a5e1..2ab41e5 100644
+--- a/BUILD/cvs-1.12.13/src/subr.c
++++ b/BUILD/cvs-1.12.13/src/subr.c
+@@ -1285,7 +1285,7 @@ format_cmdline (const char *format, ...)
+ 	    		dellist(&pflist);
+ 	    		free(b);
+ 			error (1, 0,
+-"internal error:  unknown integer arg size (%d)",
++"internal error:  unknown integer arg size (%zu)",
+                                length);
+ 			break;
+ 		}
+@@ -1328,7 +1328,7 @@ format_cmdline (const char *format, ...)
+ 	    		dellist(&pflist);
+ 	    		free(b);
+ 			error (1, 0,
+-"internal error:  unknown floating point arg size (%d)",
++"internal error:  unknown floating point arg size (%zu)",
+                                length);
+ 			break;
+ 		}

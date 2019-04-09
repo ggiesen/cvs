@@ -345,7 +345,7 @@ get_root_allow_config (const char *arg, const char *configPath)
 /* This global variable holds the global -d option.  It is NULL if -d
    was not used, which means that we must get the CVSroot information
    from the CVSROOT environment variable or from a CVS/Root file.  */
-char *CVSroot_cmdline;
+char *CVSroot_cmdline = NULL;
 
 
 

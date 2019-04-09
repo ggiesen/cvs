@@ -977,7 +977,7 @@ error ENOMEM Virtual memory exhausted.\n");
 	if (forced && !quiet
 	    && alloc_pending_warning (120 + strlen (program_name)))
 	    sprintf (pending_warning_text,
-"E %s server: Forcing compression level %d (allowed: %d <= z <= %d).",
+"E %s server: Forcing compression level %d (allowed: %d <= z <= %zu).",
 		     program_name, gzip_level, config->MinCompressionLevel,
 		     config->MaxCompressionLevel);
     }
@@ -5483,7 +5483,7 @@ serve_gzip_contents (char *arg)
     if (forced && !quiet
 	&& alloc_pending_warning (120 + strlen (program_name)))
 	sprintf (pending_warning_text,
-"E %s server: Forcing compression level %d (allowed: %d <= z <= %d).",
+"E %s server: Forcing compression level %d (allowed: %d <= z <= %zu).",
 		 program_name, level, config->MinCompressionLevel,
 		 config->MaxCompressionLevel);
 
@@ -5514,7 +5514,7 @@ serve_gzip_stream (char *arg)
     if (forced && !quiet
 	&& alloc_pending_warning (120 + strlen (program_name)))
 	sprintf (pending_warning_text,
-"E %s server: Forcing compression level %d (allowed: %d <= z <= %d).",
+"E %s server: Forcing compression level %d (allowed: %d <= z <= %zu).",
 		 program_name, level, config->MinCompressionLevel,
 		 config->MaxCompressionLevel);
 	
