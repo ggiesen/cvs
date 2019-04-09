@@ -133,7 +133,7 @@ static char *rcs_lockfilename (const char *);
    string comparisons.  This macro speeds things up a bit by skipping
    the function call when the first characters are different.  It
    evaluates its arguments multiple times.  */
-#define STREQ(a, b) (*(char *)(a) == *(char *)(b) && strcmp ((a), (b)) == 0)
+#define STREQ(a, b) ((a) != NULL && (b) != NULL && *(char *)(a) == *(char *)(b) && strcmp ((a), (b)) == 0)
 
 static char * getfullCVSname (char *, char **);
 
