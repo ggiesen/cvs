@@ -265,7 +265,7 @@ do_editor (const char *dir, char **messagep, const char *repository,
     }
 
     (void) fprintf (fp,
-  "%s----------------------------------------------------------------------\n",
+  "\n%s----------------------------------------------------------------------\n",
 		    CVSEDITPREFIX);
     (void) fprintf (fp,
   "%sEnter Log.  Lines beginning with `%.*s' are removed automatically\n%s\n",

@@ -309,6 +309,15 @@ internal error: can only call password_entry_operation with pserver method");
     fp = CVS_FOPEN (passfile, "r");
     if (fp == NULL)
     {
+       fp = CVS_FOPEN (passfile, "w");
+       if (fp != NULL)
+       {
+           fclose (fp);
+           fp = CVS_FOPEN (passfile, "r");
+       }
+    }
+    if (fp == NULL)
+    {
 	error (0, errno, "warning: failed to open %s for reading", passfile);
 	goto process;
     }
