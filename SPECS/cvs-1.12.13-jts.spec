@@ -5,7 +5,7 @@
 
 Name: cvs
 Version: 1.12.13
-Release: 1%{?dist}
+Release: 2jts%{?dist}
 Summary: Concurrent Versions System
 Group: Development/Tools
 URL: http://cvs.nongnu.org/
