@@ -1,7 +1,7 @@
-diff --git a/BUILD/cvs-1.12.13/src/parseinfo.c b/BUILD/cvs-1.12.13/src/parseinfo.c
+diff --git a/src/parseinfo.c b/src/parseinfo.c
 index 51e6873..d8d22ef 100644
---- a/BUILD/cvs-1.12.13/src/parseinfo.c
-+++ b/BUILD/cvs-1.12.13/src/parseinfo.c
+--- a/src/parseinfo.c
++++ b/src/parseinfo.c
 @@ -250,7 +250,7 @@ readSizeT (const char *infopath, const char *option, const char *p,
  		       infopath, option, p[strlen(p)]);
  		return false;
@@ -23,10 +23,10 @@ index 51e6873..d8d22ef 100644
      return true;
  }
  
-diff --git a/BUILD/cvs-1.12.13/src/root.c b/BUILD/cvs-1.12.13/src/root.c
+diff --git a/src/root.c b/src/root.c
 index 34a957c..5961716 100644
---- a/BUILD/cvs-1.12.13/src/root.c
-+++ b/BUILD/cvs-1.12.13/src/root.c
+--- a/src/root.c
++++ b/src/root.c
 @@ -345,7 +345,7 @@ get_root_allow_config (const char *arg, const char *configPath)
  /* This global variable holds the global -d option.  It is NULL if -d
     was not used, which means that we must get the CVSroot information
@@ -36,10 +36,10 @@ index 34a957c..5961716 100644
  
  
  
-diff --git a/BUILD/cvs-1.12.13/src/server.c b/BUILD/cvs-1.12.13/src/server.c
+diff --git a/src/server.c b/src/server.c
 index 6816789..5fb4a9a 100644
---- a/BUILD/cvs-1.12.13/src/server.c
-+++ b/BUILD/cvs-1.12.13/src/server.c
+--- a/src/server.c
++++ b/src/server.c
 @@ -977,7 +977,7 @@ error ENOMEM Virtual memory exhausted.\n");
  	if (forced && !quiet
  	    && alloc_pending_warning (120 + strlen (program_name)))
@@ -67,10 +67,10 @@ index 6816789..5fb4a9a 100644
  		 program_name, level, config->MinCompressionLevel,
  		 config->MaxCompressionLevel);
  	
-diff --git a/BUILD/cvs-1.12.13/src/subr.c b/BUILD/cvs-1.12.13/src/subr.c
+diff --git a/src/subr.c b/src/subr.c
 index 3c3a5e1..2ab41e5 100644
---- a/BUILD/cvs-1.12.13/src/subr.c
-+++ b/BUILD/cvs-1.12.13/src/subr.c
+--- a/src/subr.c
++++ b/src/subr.c
 @@ -1285,7 +1285,7 @@ format_cmdline (const char *format, ...)
  	    		dellist(&pflist);
  	    		free(b);
