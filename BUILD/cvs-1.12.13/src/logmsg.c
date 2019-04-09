@@ -632,6 +632,7 @@ logmsg_list_to_args_proc (Node *p, void *closure)
 		arg = p->key;
 		break;
 	    case 'T':
+	    case 't':
 		li = p->data;
 		arg = li->tag ? li->tag : "";
 		break;
