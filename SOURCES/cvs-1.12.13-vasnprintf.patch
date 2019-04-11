@@ -1,0 +1,30 @@
+--- cvs-1.12.13+real.orig/lib/vasnprintf.c
++++ cvs-1.12.13+real/lib/vasnprintf.c
+@@ -100,7 +100,12 @@
+ # define DIRECTIVE char_directive
+ # define DIRECTIVES char_directives
+ # define PRINTF_PARSE printf_parse
++#if 0
++/* disabled for security reasons, to avoid having %n in writable memory */
+ # define USE_SNPRINTF (HAVE_DECL__SNPRINTF || HAVE_SNPRINTF)
++#else
++# define USE_SNPRINTF 0
++#endif
+ # if HAVE_DECL__SNPRINTF
+    /* Windows.  */
+ #  define SNPRINTF _snprintf
+@@ -591,11 +596,12 @@
+ 		  {
+ 		    size_t maxlen;
+ 		    int count;
+-		    int retcount;
++#if USE_SNPRINTF
++		    int retcount = 0;
++#endif
+ 
+ 		    maxlen = allocated - length;
+ 		    count = -1;
+-		    retcount = 0;
+ 
+ #if USE_SNPRINTF
+ # define SNPRINTF_BUF(arg) \

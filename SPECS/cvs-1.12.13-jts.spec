@@ -88,6 +88,8 @@ Patch31: cvs-1.12.13-need-gettext-version.patch
 Patch32: cvs-1.12.13-fixjts1.patch
 # Fix ABOUT-NLS file to work autoreconf
 Patch33: cvs-1.12.13-about-nls.patch
+# Fix vasnprintf
+Patch34: cvs-1.12.13-vasnprintf.patch
 
 %description
 CVS (Concurrent Versions System) is a version control system that can
@@ -166,6 +168,7 @@ pages in PDF.
 %patch31 -p1 -b .gettext
 %patch32 -p1 -b .fixjts1
 %patch33 -p1 -b .aboutnls
+%patch34 -p1 -b .vasnprintf
 
 # Apply a patch to the generated files, OR
 # run autoreconf and require autoconf >= 2.58, automake >= 1.7.9
@@ -269,6 +272,10 @@ exit 0
 
 
 %changelog
+* Thu Apr 11 2019 Kazuhito Ishigaki <ishigaki@jtrustsystem.co.jp> - 1.12.13-3jts
+- updated to new version 1.12.13
+- Fix vasnprintf against gcc optimization
+
 * Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.11.23-35
 - Mass rebuild 2014-01-24
 

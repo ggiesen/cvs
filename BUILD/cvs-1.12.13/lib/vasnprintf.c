@@ -100,7 +100,12 @@ local_wcslen (const wchar_t *s)
 # define DIRECTIVE char_directive
 # define DIRECTIVES char_directives
 # define PRINTF_PARSE printf_parse
+#if 0
+/* disabled for security reasons, to avoid having %n in writable memory */
 # define USE_SNPRINTF (HAVE_DECL__SNPRINTF || HAVE_SNPRINTF)
+#else
+# define USE_SNPRINTF 0
+#endif
 # if HAVE_DECL__SNPRINTF
    /* Windows.  */
 #  define SNPRINTF _snprintf
@@ -591,11 +596,12 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		  {
 		    size_t maxlen;
 		    int count;
-		    int retcount;
+#if USE_SNPRINTF
+		    int retcount = 0;
+#endif
 
 		    maxlen = allocated - length;
 		    count = -1;
-		    retcount = 0;
 
 #if USE_SNPRINTF
 # define SNPRINTF_BUF(arg) \
