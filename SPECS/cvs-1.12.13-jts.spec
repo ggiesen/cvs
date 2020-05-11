@@ -182,7 +182,6 @@ for F in FAQ; do
 done
 
 %build
-%global _hardened_build 1
 autoreconf --install
 
 %if %{pamified} 
