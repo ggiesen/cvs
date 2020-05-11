@@ -30,7 +30,7 @@ Requires(postun): systemd
 Requires: vim-minimal
 BuildRequires: autoconf >= 2.58, automake >= 1.7.9, libtool, zlib-devel
 BuildRequires: vim-minimal
-BuildRequires: gettext
+BuildRequires: gettext-devel
 %if %{kerberized}
 BuildRequires: krb5-devel
 %endif
