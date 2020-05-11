@@ -1,3 +1,5 @@
+# Do not create a hardened build
+%undefine _hardened_build
 # Use PAM for pserver autentization
 %define pamified 1
 # Use kerberos
