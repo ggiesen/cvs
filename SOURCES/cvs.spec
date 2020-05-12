@@ -172,6 +172,7 @@ pages in PDF.
 %patch32 -p1 -b .fixjts1
 %patch33 -p1 -b .aboutnls
 %patch34 -p1 -b .vasnprintf
+%patch35 -p1 -b .printf
 
 # Apply a patch to the generated files, OR
 # run autoreconf and require autoconf >= 2.58, automake >= 1.7.9
