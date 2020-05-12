@@ -91,6 +91,8 @@ Patch32: cvs-1.12.13-fixjts1.patch
 Patch33: cvs-1.12.13-about-nls.patch
 # Fix vasnprintf
 Patch34: cvs-1.12.13-vasnprintf.patch
+# Fix fprint
+Patch35: cvs-1.12.13-diff3-fprint.patch
 
 %description
 CVS (Concurrent Versions System) is a version control system that can
