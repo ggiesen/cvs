@@ -1,0 +1,73 @@
+--- cvs-1.12.13+real.orig/diff/diff3.c
++++ cvs-1.12.13+real/diff/diff3.c
+@@ -1439,14 +1439,13 @@
+      int const mapping[3], rev_mapping[3];
+ {
+   int i;
+-  int oddoneout;
++  int oddoneout = 0;
+   char *cp;
+   struct diff3_block *ptr;
+   int line;
+   size_t length;
+-  int dontprint;
++  int dontprint = 0;
+   static int skew_increment[3] = { 2, 3, 1 }; /* 0==>2==>1==>3 */
+-  char const *line_prefix = tab_align_flag ? "\t" : "  ";
+ 
+   for (ptr = diff; ptr; ptr = D_NEXT (ptr))
+     {
+@@ -1503,7 +1502,7 @@
+ 	      line = 0;
+ 	      do
+ 		{
+-		  printf_output (line_prefix);
++		  printf_output (tab_align_flag ? "\t" : "  ");
+ 		  cp = D_RELNUM (ptr, realfile, line);
+ 		  length = D_RELLEN (ptr, realfile, line);
+ 		  write_output (cp, length);
+@@ -1555,11 +1554,12 @@
+      int leading_dot, start, num;
+ {
+   write_output (".\n", 2);
+-  if (leading_dot)
++  if (leading_dot) {
+     if (num == 1)
+       printf_output ("%ds/^\\.//\n", start);
+     else
+       printf_output ("%d,%ds/^\\.//\n", start, start + num - 1);
++  }
+ }
+ 
+ /*
+@@ -1750,11 +1750,12 @@
+ 	do
+ 	  {
+ 	    c = getc (infile);
+-	    if (c == EOF)
++	    if (c == EOF) {
+ 	      if (ferror (infile))
+ 		diff3_perror_with_exit ("input file");
+ 	      else if (feof (infile))
+ 		diff3_fatal ("input file shrank");
++	    }
+ 	    cc = c;
+ 	    write_output (&cc, 1);
+ 	  }
+@@ -1804,7 +1805,7 @@
+       linesread += i;
+       while (0 <= --i)
+ 	while ((c = getc (infile)) != '\n')
+-	  if (c == EOF)
++	  if (c == EOF) {
+ 	    if (ferror (infile))
+ 	      diff3_perror_with_exit ("input file");
+ 	    else if (feof (infile))
+@@ -1813,6 +1814,7 @@
+ 		  diff3_fatal ("input file shrank");
+ 		return conflicts_found;
+ 	      }
++	  }
+     }
+   /* Copy rest of common file.  */
+   while ((c = getc (infile)) != EOF || !(ferror (infile) | feof (infile)))
